@@ -84,3 +84,50 @@ def get_analytics(db: Session = Depends(get_db)):
             analytics[loc][d] += 1
             
     return analytics
+
+
+@app.get("/alerts")
+def get_alerts(threshold: int = 3, db: Session = Depends(get_db)):
+    """
+    Alert system for health authorities.
+    Flags any disease in a location where the case count >= threshold.
+    - threshold=3 (default): triggers alert when 3+ cases of the same disease appear in one location.
+    - Returns a list of alert objects with severity, location, disease, and count.
+    """
+    from typing import Dict, Any, List
+    patients = db.query(models.Patient).all()
+
+    # Build disease counts per location
+    location_disease_counts: Dict[str, Dict[str, int]] = {}
+    for p in patients:
+        loc = p.location
+        if loc not in location_disease_counts:
+            location_disease_counts[loc] = {}
+        diseases = [d.strip() for d in p.disease_history.split(",") if d.strip()]
+        for d in diseases:
+            if d not in location_disease_counts[loc]:
+                location_disease_counts[loc][d] = 0
+            location_disease_counts[loc][d] += 1
+
+    # Generate alerts
+    alerts: List[Dict[str, Any]] = []
+    for loc, diseases in location_disease_counts.items():
+        for disease, count in diseases.items():
+            if count >= threshold:
+                severity = "HIGH" if count >= threshold * 2 else "MEDIUM"
+                alerts.append({
+                    "location": loc,
+                    "disease": disease,
+                    "count": count,
+                    "severity": severity,
+                    "message": f"⚠️ {severity} ALERT: {count} cases of {disease} detected in {loc}!"
+                })
+
+    # Sort by count descending (most critical first)
+    alerts.sort(key=lambda x: x["count"], reverse=True)
+
+    return {
+        "total_alerts": len(alerts),
+        "threshold_used": threshold,
+        "alerts": alerts
+    }
