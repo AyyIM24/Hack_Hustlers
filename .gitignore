@@ -31,3 +31,23 @@ yarn-error.log*
 .gradle/
 build/
 !gradle-wrapper.jar
+
+# ===== Python specific =====
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# SQLite database (contains patient data!)
+*.db
+
+# Generated QR codes
+qrcodes/
+
+# Test files (optional)
+test_app.py

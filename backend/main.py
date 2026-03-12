@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from typing import Dict, Any, List
 
 try:
     from . import models, schemas, database
@@ -37,6 +38,8 @@ def get_db():
     finally:
         db.close()
 
+
+# ==================== REGISTER ====================
 @app.post("/register", response_model=schemas.PatientResponse)
 def register_patient(patient: schemas.PatientCreate, db: Session = Depends(get_db)):
     max_id = db.query(func.max(models.Patient.id)).scalar()
@@ -56,6 +59,9 @@ def register_patient(patient: schemas.PatientCreate, db: Session = Depends(get_d
         patient_id=patient_id,
         name=patient.name,
         age=patient.age,
+        gender=patient.gender,
+        blood_group=patient.blood_group,
+        contact=patient.contact,
         location=patient.location,
         disease_history=patient.disease_history,
         prescriptions=patient.prescriptions,
@@ -66,9 +72,79 @@ def register_patient(patient: schemas.PatientCreate, db: Session = Depends(get_d
     db.refresh(db_patient)
     return db_patient
 
+
+# ==================== GET SINGLE PATIENT ====================
+@app.get("/patient/{patient_id}")
+def get_patient(patient_id: str, db: Session = Depends(get_db)):
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return {
+        "id": patient.patient_id,
+        "name": patient.name,
+        "age": patient.age,
+        "gender": patient.gender or "N/A",
+        "bloodGroup": patient.blood_group or "N/A",
+        "blood_group": patient.blood_group or "N/A",
+        "contact": patient.contact or "",
+        "location": patient.location,
+        "disease_history": patient.disease_history,
+        "prescriptions": patient.prescriptions,
+        "qr_code_path": patient.qr_code_path,
+        "status": "Verified Record",
+    }
+
+
+# ==================== LIST ALL PATIENTS ====================
+@app.get("/patients")
+def list_patients(db: Session = Depends(get_db)):
+    patients = db.query(models.Patient).all()
+    return [
+        {
+            "id": p.patient_id,
+            "name": p.name,
+            "age": p.age,
+            "gender": p.gender or "N/A",
+            "blood_group": p.blood_group or "N/A",
+            "contact": p.contact or "",
+            "location": p.location,
+            "disease_history": p.disease_history,
+            "prescriptions": p.prescriptions,
+            "qr_code_path": p.qr_code_path,
+        }
+        for p in patients
+    ]
+
+
+# ==================== UPDATE PATIENT RECORD ====================
+@app.put("/patient/{patient_id}")
+def update_patient(patient_id: str, update: schemas.PatientUpdate, db: Session = Depends(get_db)):
+    patient = db.query(models.Patient).filter(models.Patient.patient_id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    
+    if update.disease_history:
+        # Append new diagnosis to existing history
+        existing = patient.disease_history or ""
+        patient.disease_history = f"{existing}, {update.disease_history}" if existing and existing != "None" else update.disease_history
+    
+    if update.prescriptions:
+        existing = patient.prescriptions or ""
+        patient.prescriptions = f"{existing}, {update.prescriptions}" if existing and existing != "Pending evaluation" else update.prescriptions
+
+    db.commit()
+    db.refresh(patient)
+    return {
+        "message": "Record updated successfully",
+        "patient_id": patient.patient_id,
+        "disease_history": patient.disease_history,
+        "prescriptions": patient.prescriptions,
+    }
+
+
+# ==================== ANALYTICS ====================
 @app.get("/analytics")
 def get_analytics(db: Session = Depends(get_db)):
-    from typing import Dict, Any
     patients = db.query(models.Patient).all()
     
     analytics: Dict[str, Any] = {}
@@ -86,18 +162,11 @@ def get_analytics(db: Session = Depends(get_db)):
     return analytics
 
 
+# ==================== ALERTS ====================
 @app.get("/alerts")
 def get_alerts(threshold: int = 3, db: Session = Depends(get_db)):
-    """
-    Alert system for health authorities.
-    Flags any disease in a location where the case count >= threshold.
-    - threshold=3 (default): triggers alert when 3+ cases of the same disease appear in one location.
-    - Returns a list of alert objects with severity, location, disease, and count.
-    """
-    from typing import Dict, Any, List
     patients = db.query(models.Patient).all()
 
-    # Build disease counts per location
     location_disease_counts: Dict[str, Dict[str, int]] = {}
     for p in patients:
         loc = p.location
@@ -109,7 +178,6 @@ def get_alerts(threshold: int = 3, db: Session = Depends(get_db)):
                 location_disease_counts[loc][d] = 0
             location_disease_counts[loc][d] += 1
 
-    # Generate alerts
     alerts: List[Dict[str, Any]] = []
     for loc, diseases in location_disease_counts.items():
         for disease, count in diseases.items():
@@ -123,7 +191,6 @@ def get_alerts(threshold: int = 3, db: Session = Depends(get_db)):
                     "message": f"⚠️ {severity} ALERT: {count} cases of {disease} detected in {loc}!"
                 })
 
-    # Sort by count descending (most critical first)
     alerts.sort(key=lambda x: x["count"], reverse=True)
 
     return {

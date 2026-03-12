@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import QrScannerView from './QrScannerView';
 import SmartHealthCard from './SmartHealthCard';
-import { fetchPatientById } from '../data/mockPatients';
+import { getPatientById } from '../api';
 import { ScanLine, RotateCcw, AlertTriangle, Loader2 } from 'lucide-react';
 
 const ScanWorkflow = () => {
-  // States: 'scanning' | 'loading' | 'result' | 'error'
   const [phase, setPhase] = useState('scanning');
   const [patientData, setPatientData] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleScanSuccess = async (scannedId) => {
+  const handleScanSuccess = async (scannedValue) => {
     setPhase('loading');
     setErrorMsg('');
     try {
-      const patient = await fetchPatientById(scannedId);
+      // Extract the patient ID from scanned URL or direct ID
+      // QR codes link to http://localhost:5173/patient/MED-001, so extract the ID
+      let patientId = scannedValue;
+      if (scannedValue.includes('/patient/')) {
+        patientId = scannedValue.split('/patient/').pop();
+      }
+      
+      const patient = await getPatientById(patientId);
       setPatientData(patient);
       setPhase('result');
     } catch (err) {
@@ -31,7 +37,6 @@ const ScanWorkflow = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Page Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-brand-dark font-serif flex items-center gap-3">
           <ScanLine size={28} className="text-brand-accent" />
@@ -45,12 +50,10 @@ const ScanWorkflow = () => {
         </p>
       </div>
 
-      {/* === SCANNING PHASE === */}
       {phase === 'scanning' && (
         <QrScannerView onScanSuccess={handleScanSuccess} />
       )}
 
-      {/* === LOADING PHASE === */}
       {phase === 'loading' && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <div className="bg-white p-6 rounded-2xl shadow-md border border-brand-accent/20">
@@ -61,7 +64,6 @@ const ScanWorkflow = () => {
         </div>
       )}
 
-      {/* === RESULT PHASE === */}
       {phase === 'result' && patientData && (
         <div className="space-y-8">
           <SmartHealthCard patientData={patientData} />
@@ -77,7 +79,6 @@ const ScanWorkflow = () => {
         </div>
       )}
 
-      {/* === ERROR PHASE === */}
       {phase === 'error' && (
         <div className="flex flex-col items-center justify-center py-16 gap-6">
           <div className="bg-red-50 p-6 rounded-2xl shadow-md border border-red-200">
