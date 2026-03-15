@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, User, ArrowLeft, ShieldCheck, Activity, Building2, ShieldAlert, Stethoscope } from 'lucide-react';
-import axios from 'axios';
+import API from '../api';
 
 const StaffLogin = ({ onLoginSuccess, onBack, onRegister, role }) => {
   const [username, setUsername] = useState('');
@@ -56,7 +56,7 @@ const StaffLogin = ({ onLoginSuccess, onBack, onRegister, role }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/login', {
+      const response = await API.post('/login', {
         username,
         password
       });

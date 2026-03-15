@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Users, AlertTriangle, ArrowLeft, BarChart2, MapPin } from 'lucide-react';
+import { getAlerts } from '../api';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import PredictionDashboard from './PredictionDashboard';
@@ -12,8 +13,8 @@ const AdminPortal = ({ onLogout }) => {
     // Fetch global alerts when the HA logs in
     const fetchAlerts = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/alerts?threshold=3');
-        const alerts = response.data.alerts;
+        const data = await getAlerts(3);
+        const alerts = data.alerts;
         
         // Spawn toast notifications for high severity alerts
         let count = 0;

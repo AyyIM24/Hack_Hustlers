@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { User, MapPin, Download, Droplet } from 'lucide-react';
+import { BASE_URL } from '../api';
 
 const SmartHealthCard = ({ patientData }) => {
   const cardRef = useRef(null);
@@ -54,7 +55,7 @@ const SmartHealthCard = ({ patientData }) => {
           downloadCanvas(canvas);
         };
         img.onerror = () => downloadCanvas(canvas);
-        img.src = `http://localhost:8000${data.qr_code_path}`;
+        img.src = `${BASE_URL}${data.qr_code_path}`;
       } else {
         downloadCanvas(canvas);
       }
@@ -90,7 +91,7 @@ const SmartHealthCard = ({ patientData }) => {
         <div className="p-6 relative z-10 space-y-5">
           <div className="bg-brand-light p-4 rounded-xl flex flex-col items-center justify-center shadow-inner mx-auto w-40 h-40 border-4 border-white">
             {data.qr_code_path ? (
-              <img src={`http://localhost:8000${data.qr_code_path}`} alt="Patient QR Code" className="w-[100px] h-[100px] object-contain" />
+              <img src={`${BASE_URL}${data.qr_code_path}`} alt="Patient QR Code" className="w-[100px] h-[100px] object-contain" />
             ) : (
               <QRCodeSVG value={qrValue} size={100} bgColor="#F5F5DC" fgColor="#3E2723" level="M" includeMargin={false} />
             )}

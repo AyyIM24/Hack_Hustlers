@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getPredictions } from '../api';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart 
 } from 'recharts';
@@ -15,10 +16,10 @@ const PredictionDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8000/predict');
-      if (response.data.status === 'success') {
-        setData(response.data.predictions);
-        const diseases = Object.keys(response.data.predictions);
+      const data = await getPredictions();
+      if (data.status === 'success') {
+        setData(data.predictions);
+        const diseases = Object.keys(data.predictions);
         if (diseases.length > 0) {
           setSelectedDisease(diseases[0]);
         }

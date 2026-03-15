@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
+import { getAnalytics } from '../api';
 import { Activity, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
 
 // Common India/Global coordinates mapping for demo purposes.
@@ -38,8 +39,8 @@ const DiseaseHeatmap = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8000/analytics');
-      setData(response.data);
+      const data = await getAnalytics();
+      setData(data);
     } catch (err) {
       setError('Failed to fetch spatial outbreak data. Is the backend running?');
       console.error(err);

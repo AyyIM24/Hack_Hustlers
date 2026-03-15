@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Lock, Mail, Building2, Stethoscope, ArrowLeft, ShieldCheck, UserPlus } from 'lucide-react';
-import axios from 'axios';
+import API from '../api';
 import toast from 'react-hot-toast';
 
 const StaffRegistration = ({ onBack, initialRole = 'doctor' }) => {
@@ -34,7 +34,7 @@ const StaffRegistration = ({ onBack, initialRole = 'doctor' }) => {
 
     setIsLoading(true);
     try {
-      await axios.post('http://localhost:8000/staff/register', {
+      await API.post('/staff/register', {
         username: formData.username,
         password: formData.password,
         role: formData.role,

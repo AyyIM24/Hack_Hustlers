@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const BASE_URL = 'https://hack-hustlers.onrender.com';
+
 const API = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: BASE_URL,
 });
 
 export const registerPatient = async (patientData) => {
@@ -31,6 +33,11 @@ export const getAnalytics = async () => {
 
 export const getAlerts = async (threshold = 3) => {
   const response = await API.get(`/alerts?threshold=${threshold}`);
+  return response.data;
+};
+
+export const getPredictions = async () => {
+  const response = await API.get('/predict');
   return response.data;
 };
 

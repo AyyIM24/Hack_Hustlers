@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, MapPin, Calendar, Activity, Phone, Droplet, Users, CheckCircle, Loader2, CreditCard } from 'lucide-react';
-import { registerPatient } from '../api';
+import { registerPatient, BASE_URL } from '../api';
 
 const RegistrationForm = ({ onRegistered, onViewCard }) => {
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ const RegistrationForm = ({ onRegistered, onViewCard }) => {
       }
     } catch (err) {
       console.error('Registration failed:', err);
-      setError(err.response?.data?.detail || 'Registration failed. Is the backend running on port 8000?');
+      setError(err.response?.data?.detail || `Registration failed. Is the backend running on ${BASE_URL}?`);
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ const RegistrationForm = ({ onRegistered, onViewCard }) => {
         <div className="mb-6">
           <p className="text-sm font-semibold text-brand-accent uppercase tracking-wider mb-3">Scan QR Code for Patient Portal</p>
           <div className="inline-block bg-white p-4 rounded-xl shadow-lg border-2 border-brand-accent/20">
-            <img src={`http://localhost:8000${registeredPatient.qr_code_path}`} alt={`QR Code for ${registeredPatient.patient_id}`} className="w-48 h-48 mx-auto" />
+            <img src={`${BASE_URL}${registeredPatient.qr_code_path}`} alt={`QR Code for ${registeredPatient.patient_id}`} className="w-48 h-48 mx-auto" />
           </div>
         </div>
         
