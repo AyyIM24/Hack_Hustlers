@@ -4,8 +4,12 @@
 [![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61dafb)](https://reactjs.org/)
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://medtechapothecary.vercel.app/)
 
 **Apothecary** is a next-generation healthcare platform designed for efficiency, predictive accuracy, and secure patient data management. Developed for the **Hack_Hustlers** initiative, it bridges the gap between clinical registration and health authority oversight through AI-driven insights.
+
+## 🔗 Live Demo
+Experience the live application here: **[medtechapothecary.vercel.app](https://medtechapothecary.vercel.app/)**
 
 ---
 
