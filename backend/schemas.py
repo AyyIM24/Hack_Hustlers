@@ -29,3 +29,21 @@ class PatientResponse(BaseModel):
     qr_code_path: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class StaffCreate(BaseModel):
+    username: str
+    password: str
+    role: str
+    name: str
+    specialization: Optional[str] = None
+    hospital_name: Optional[str] = None
+
+class StaffResponse(BaseModel):
+    id: int
+    username: str
+    role: str
+    name: str
+    specialization: Optional[str]
+    hospital_name: Optional[str]
+
+    model_config = ConfigDict(from_attributes=True)

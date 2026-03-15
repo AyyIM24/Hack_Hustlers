@@ -4,3 +4,6 @@ sqlalchemy
 pydantic
 qrcode[pil]
 httpx
+pandas
+numpy
+scikit-learn

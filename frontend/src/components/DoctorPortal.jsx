@@ -7,7 +7,7 @@ import MedicalRecordUpdate from './MedicalRecordUpdate';
 import DiseaseDashboard from './DiseaseDashboard';
 import OutbreakAlerts from './OutbreakAlerts';
 
-const DoctorPortal = ({ onBack }) => {
+const DoctorPortal = ({ onBack, user }) => {
   const [currentView, setCurrentView] = useState('register');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lastRegisteredPatient, setLastRegisteredPatient] = useState(null);
@@ -97,11 +97,11 @@ const DoctorPortal = ({ onBack }) => {
           <div className="p-4">
             <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-brand-light/30 border border-brand-accent/10 mb-3">
               <div className="h-10 w-10 rounded-full bg-brand text-brand-dark flex items-center justify-center font-bold text-sm">
-                DR
+                {user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-bold text-brand-dark">Dr. Reynolds</p>
-                <p className="text-xs text-brand-accent">General Practitioner</p>
+                <p className="text-sm font-bold text-brand-dark">{user.name}</p>
+                <p className="text-xs text-brand-accent">{user.specialization || "Medical Practitioner"}</p>
               </div>
             </div>
             <button

@@ -18,3 +18,14 @@ class Patient(Base):
     disease_history = Column(String)
     prescriptions = Column(String)
     qr_code_path = Column(String)
+
+class Staff(Base):
+    __tablename__ = "staff"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    password = Column(String)  # In a real app, use hashing!
+    role = Column(String)      # doctor, hospital, admin
+    name = Column(String)
+    specialization = Column(String, nullable=True)
+    hospital_name = Column(String, nullable=True)

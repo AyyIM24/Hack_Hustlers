@@ -3,3 +3,6 @@ uvicorn
 sqlalchemy
 pydantic
 qrcode[pil]
+pandas
+numpy
+scikit-learn
